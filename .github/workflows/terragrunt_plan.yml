@@ -1,21 +1,47 @@
-name: Check terraform file formatting
+name: Terraform Build
 
-on: [push]
+on:
+  push:
+    branches: [ master ]
+
+env:
+  AWS_REGION: us-east-1
 
 jobs:
-  check_format:
+  build:
     runs-on: ubuntu-latest
-    name: Check terraform file are formatted correctly
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      - name: terraform fmt
-        uses: dflook/terraform-fmt-check@v1
-        id: fmt-check
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v1
         with:
-          path: my-terraform-config
+          terraform_version: '1.0.1'
 
-      - name: Wrong formatting found
-        if: ${{ failure() && steps.fmt-check.outputs.failure-reason == 'check-failed' }}
-        run: echo "terraform formatting check failed"
+      - name: Install Terraform Linters
+        run: |
+          curl https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+          curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/install.sh | sudo sh -s -- -b /usr/local/bin 0.58.9
+
+      - name: Terraform Fmt
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Tflint
+        run: tflint
+
+      - name: Terraform Tfsec
+        run: tfsec
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
