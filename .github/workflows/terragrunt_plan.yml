@@ -1,8 +1,7 @@
-name: Terraform Build
-
+name: 'Terragrunt Plan'
 on:
-  push:
-    branches: [ master ]
+  pull_request:
+    branches: [ main ]
 
 env:
   AWS_REGION: us-east-1
