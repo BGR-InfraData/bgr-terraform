@@ -25,7 +25,7 @@ resource "aws_instance" "ec2_bgr_infra" {
   #tfsec:ignore:aws-ec2-no-public-egress-sgr
   #tfsec:ignore:aws-vpc-no-public-egress-sgr
   #tfsec:ignore:aws-ec2-no-public-ingress-sgr
-  #tfsenc:ignore:aws-ec2-add-description-to-security-group-rule
+  #tfsec:ignore:aws-ec2-add-description-to-security-group-rule
   vpc_security_group_ids      = [var.security_group_id]
   associate_public_ip_address = true
 
