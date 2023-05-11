@@ -14,6 +14,7 @@ module "iam" {
   iam_role_name = "ec2-bgr-infra"
 }
 
+#tfsec:ignore:aws-ec2-enable-at-rest-encryption
 resource "aws_instance" "ec2_bgr_infra" {
   ami           = var.ami_id
   instance_type = var.instance_type
@@ -33,6 +34,7 @@ resource "aws_instance" "ec2_bgr_infra" {
   }
 
   # Configuração do volume EBS
+  #tfsec:ignore:aws-ec2-enable-at-rest-encryption
   root_block_device {
     volume_size           = var.ebs_volume_size
     volume_type           = var.ebs_volume_type

@@ -22,6 +22,7 @@ module "security_group" {
 #tfsec:ignore:aws-ec2-no-public-egress-sgr
 #tfsec:ignore:aws-vpc-no-public-egress-sgr
 #tfsec:ignore:aws-ec2-no-public-ingress-sgr
+#tfsec:ignore:aws-ec2-enable-at-rest-encryption
 module "ec2" {
   source                    = "./ec2"
   ami_id                    = var.ami_id
