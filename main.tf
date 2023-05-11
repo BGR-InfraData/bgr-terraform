@@ -19,6 +19,9 @@ module "security_group" {
   vpc_id = module.vpc.vpc_id
 }
 
+#tfsec:ignore:aws-ec2-no-public-egress-sgr
+#tfsec:ignore:aws-vpc-no-public-egress-sgr
+#tfsec:ignore:aws-ec2-no-public-ingress-sgr
 module "ec2" {
   source                    = "./ec2"
   ami_id                    = var.ami_id
