@@ -8,7 +8,7 @@ module "security_group" {
 }
 
 module "iam" {
-  source = "../IAM"
+  source        = "../IAM"
   iam_role_name = "ec2-bgr-infra"
 }
 
@@ -17,7 +17,7 @@ resource "aws_instance" "ec2_bgr_infra" {
   instance_type = var.instance_type
   subnet_id     = var.subnet_id
 
-  vpc_security_group_ids = [var.security_group_id]
+  vpc_security_group_ids      = [var.security_group_id]
   associate_public_ip_address = true
 
   iam_instance_profile = module.iam.role_name
@@ -27,10 +27,10 @@ resource "aws_instance" "ec2_bgr_infra" {
     App  = "bgr-infra"
   }
 
-    # Configuração do volume EBS
+  # Configuração do volume EBS
   root_block_device {
-    volume_size = var.ebs_volume_size
-    volume_type = var.ebs_volume_type
+    volume_size           = var.ebs_volume_size
+    volume_type           = var.ebs_volume_type
     delete_on_termination = var.ebs_delete_on_termination
   }
   user_data = <<-EOF

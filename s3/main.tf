@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "bgr_infra" {
-  bucket = "bgr-infra"
+  bucket        = "bgr-infra"
   force_destroy = true
 
   tags = {
@@ -11,9 +11,9 @@ resource "aws_s3_bucket" "bgr_infra" {
 resource "aws_s3_bucket_public_access_block" "bgr_infra_public_access_block" {
   bucket = aws_s3_bucket.bgr_infra.id
 
-  block_public_acls   = true
-  block_public_policy = true
-  ignore_public_acls  = true
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
   restrict_public_buckets = true
 }
 

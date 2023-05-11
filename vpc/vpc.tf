@@ -22,7 +22,7 @@ resource "aws_internet_gateway" "gateway_igw_bgr" {
 resource "aws_route_table" "rt_bgr_infra" {
   vpc_id = aws_vpc.vpc_bgr_infra.id
   route {
-        cidr_block = "0.0.0.0/0"
+    cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.gateway_igw_bgr.id
   }
 }
