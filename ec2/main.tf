@@ -16,6 +16,7 @@ module "iam" {
 
 #tfsec:ignore:aws-ec2-enable-at-rest-encryption
 #tfsec:ignore:aws-ec2-enforce-http-token-imds
+#tfsenc:ignore:aws-ec2-add-description-to-security-group-rule
 resource "aws_instance" "ec2_bgr_infra" {
   ami           = var.ami_id
   instance_type = var.instance_type
@@ -24,6 +25,7 @@ resource "aws_instance" "ec2_bgr_infra" {
   #tfsec:ignore:aws-ec2-no-public-egress-sgr
   #tfsec:ignore:aws-vpc-no-public-egress-sgr
   #tfsec:ignore:aws-ec2-no-public-ingress-sgr
+  #tfsenc:ignore:aws-ec2-add-description-to-security-group-rule
   vpc_security_group_ids      = [var.security_group_id]
   associate_public_ip_address = true
 
