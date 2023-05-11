@@ -3,9 +3,8 @@ terraform {
 }
 
 module "iam" {
-  source         = "./iam"
-  iam_role_name  = "ec2-bgr-infra"
-  aws_access_iam = var.aws_access_iam
+  source        = "./iam"
+  iam_role_name = "ec2-bgr-infra"
 }
 
 module "vpc" {
@@ -32,5 +31,5 @@ module "ec2" {
 
 module "s3" {
   source         = "./s3"
-  aws_account_id = var.aws_account_id
+  aws_access_iam = var.aws_access_iam
 }
