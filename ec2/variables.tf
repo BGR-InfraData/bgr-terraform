@@ -17,13 +17,13 @@ variable "instance_name" {
 }
 
 variable "ebs_volume_size" {
-  description = "Size of the additional EBS volume"
+  description = "Size of the additional EBS volume in GiB"
   type        = number
   default     = 50
 }
 
 variable "ebs_volume_type" {
-  description = "Type of the additional EBS volume"
+  description = "Type of the additional EBS volume (gp2/io1/sc1/st1)"
   type        = string
   default     = "gp2"
 }
@@ -34,8 +34,17 @@ variable "ebs_delete_on_termination" {
   default     = true
 }
 
-variable "aws_account_id" {
-  description = "AWS Account ID"
+variable "subnet_id" {
+  description = "Subnet ID para a instância EC2"
   type        = string
-  default     = "444860385156"
+}
+
+variable "security_group_id" {
+  description = "Security Group ID para a instância EC2"
+  type        = string
+}
+
+variable "iam_instance_profile" {
+  description = "IAM Instance Profile para a instância EC2"
+  type        = string
 }

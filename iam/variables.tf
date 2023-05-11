@@ -1,4 +1,4 @@
 variable "iam_role_name" {
-  description = "The name IAM role to be attached to the EC2 instance"
+  description = "O nome da IAM role a ser anexada à instância EC2"
   type        = string
 }
