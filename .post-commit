@@ -1,0 +1,119 @@
+#!/bin/bash
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m' # No Color
+
+FAILED=0
+echo "Mergeando a branch com a main"
+git pull --no-edit origin main
+
+if [[ $? -eq 0 ]];
+then
+   echo -e "${GREEN}Succesfully merged with main branch${NC}"
+else
+   echo -e "${RED}Fail to merge with main branch, please check again${NC}"
+   FAILED=1
+fi
+echo
+
+export BACKEND="local.hcl"
+export SKIP_OUTPUTS=true
+
+TERRAGRUNT_WORKDIRS=$(git diff --name-only origin/main... | grep live | sed -r 's|/[^/]+$||' |  grep -v -e live$ -e _env$ -e module$ | sort | uniq | xargs)
+
+GIT_ROOT_DIR=$(git rev-parse --show-toplevel)
+cd $GIT_ROOT_DIR
+
+for TERRAGRUNT_WORKDIR in $TERRAGRUNT_WORKDIRS; do
+   if [ -d $TERRAGRUNT_WORKDIR ]; then
+      echo "+ Validando $TERRAGRUNT_WORKDIR"
+
+      echo -n "  - Checking tflint.. "
+      TFLINT_RESULT=0
+      tflint $TERRAGRUNT_WORKDIR --config=live/.tflint.hcl --disable-rule=terraform_required_providers --disable-rule=terraform_required_version|| TFLINT_RESULT=1
+      if [[ $TFLINT_RESULT -eq 0 ]];
+      then
+         echo -e "${GREEN}[OK]${NC}"
+      fi
+
+      echo -n "  - Checking tfsec.. "
+      TFSEC_RESULT=0
+      tfsec $TERRAGRUNT_WORKDIR --config-file live/.tfsec.yml --exclude-path modules > /dev/null || TFSEC_RESULT=1
+
+      if [[ $TFSEC_RESULT -eq 0 ]];
+      then
+         echo -e "${GREEN}[OK]${NC}"
+      else
+         tfsec $TERRAGRUNT_WORKDIR --config-file live/.tfsec.yml --exclude-path modules
+      fi
+
+      cd $TERRAGRUNT_WORKDIR
+
+      echo -n "  - Checking terragrunt input validation.. "
+      TERRAGRUNT_INPUT_VALIDATION_RESULT=0
+      terragrunt run-all init --terragrunt-non-interactive > /dev/null 2>&1 || TERRAGRUNT_VALIDATE_RESULT=1
+      terragrunt validate-inputs --terragrunt-strict-validate > /dev/null 2>&1 || TERRAGRUNT_INPUT_VALIDATION_RESULT=1
+
+      if [[ $TERRAGRUNT_INPUT_VALIDATION_RESULT -eq 0 ]];
+      then
+         echo -e "${GREEN}[OK]${NC}"
+      else
+         terragrunt run-all init --terragrunt-non-interactive
+         terragrunt validate-inputs --terragrunt-strict-validate > /dev/null
+      fi
+
+      echo -n "  - Checking terraform validate.. "
+      TERRAGRUNT_VALIDATE_RESULT=0
+      terragrunt run-all validate --terragrunt-non-interactive > /dev/null 2>&1 || TERRAGRUNT_VALIDATE_RESULT=1
+
+      if [[ $TERRAGRUNT_VALIDATE_RESULT -eq 0 ]];
+      then
+         echo -e "${GREEN}[OK]${NC}"
+      else
+         terragrunt run-all validate --terragrunt-non-interactive
+      fi
+
+      echo -n "  - Checking terraform plan validation.. "
+      TERRAGRUNT_PLAN_RESULT=0
+
+      aws sts get-caller-identity > /dev/null 2>&1
+
+      if [[ $? -eq 0 ]]; then
+         terragrunt run-all plan --terragrunt-non-interactive > /dev/null 2>&1 || TERRAGRUNT_PLAN_RESULT=1
+
+         if [[ $TERRAGRUNT_PLAN_RESULT -eq 0 ]];
+         then
+            echo -e "${GREEN}[OK]${NC}"
+         else
+            terragrunt run-all plan --terragrunt-non-interactive
+         fi
+      else
+         echo -e "${YELLOW}[Some issue about AWS credentials was found. Skipping plan validation]${NC}"
+         aws sts get-caller-identity
+         echo
+      fi
+
+      cd -
+
+      if [[ $TFLINT_RESULT -eq 0 && $TFSEC_RESULT -eq 0 && $TERRAGRUNT_INPUT_VALIDATION_RESULT -eq 0 && $TERRAGRUNT_VALIDATE_RESULT -eq 0  && $TERRAGRUNT_PLAN_RESULT -eq 0 ]];
+      then
+         echo -e "${GREEN}All checked validations finished successfully!${NC}"
+         echo
+      else
+         echo -e "${RED}Some validation has failed! Please check.${NC}"
+         echo
+         FAILED=1
+      fi
+   fi
+done
+
+# to clean all local backend files created
+find live -name terraform.tf -type f -exec rm {} \; > /dev/null 2>&1
+find live -name provider.tf -type f -exec rm {} \; > /dev/null 2>&1
+find live -name .terraform.lock.hcl -type f -exec rm {} \; > /dev/null 2>&1
+find live -name .terraform -type d -exec rm -rf {} \; > /dev/null 2>&1
+
+[ ${FAILED} -eq 1 ] && exit 1
+exit 0
