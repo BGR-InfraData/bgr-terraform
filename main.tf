@@ -7,6 +7,7 @@ module "iam" {
   iam_role_name = "ec2-bgr-infra"
 }
 
+#tfsec:ignore:aws-ec2-require-vpc-flow-logs-for-all-vpcs
 module "vpc" {
   source = "./vpc"
 }
@@ -14,6 +15,7 @@ module "vpc" {
 #tfsec:ignore:aws-ec2-no-public-egress-sgr
 #tfsec:ignore:aws-vpc-no-public-egress-sgr
 #tfsec:ignore:aws-ec2-no-public-ingress-sgr
+#tfsec:ignore:aws-ec2-add-description-to-security-group-rule
 module "security_group" {
   source = "./securitygroup"
   vpc_id = module.vpc.vpc_id

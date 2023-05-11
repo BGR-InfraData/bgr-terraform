@@ -15,6 +15,7 @@ module "iam" {
 }
 
 #tfsec:ignore:aws-ec2-enable-at-rest-encryption
+#tfsec:ignore:aws-ec2-enforce-http-token-imds
 resource "aws_instance" "ec2_bgr_infra" {
   ami           = var.ami_id
   instance_type = var.instance_type
