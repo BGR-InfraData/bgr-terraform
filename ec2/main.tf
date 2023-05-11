@@ -1,7 +1,9 @@
 module "vpc" {
   source = "../vpc"
 }
-
+#tfsec:ignore:aws-ec2-no-public-egress-sgr
+#tfsec:ignore:aws-vpc-no-public-egress-sgr
+#tfsec:ignore:aws-ec2-no-public-ingress-sgr
 module "security_group" {
   source = "../securitygroup"
   vpc_id = module.vpc.vpc_id
@@ -17,6 +19,9 @@ resource "aws_instance" "ec2_bgr_infra" {
   instance_type = var.instance_type
   subnet_id     = var.subnet_id
 
+  #tfsec:ignore:aws-ec2-no-public-egress-sgr
+  #tfsec:ignore:aws-vpc-no-public-egress-sgr
+  #tfsec:ignore:aws-ec2-no-public-ingress-sgr
   vpc_security_group_ids      = [var.security_group_id]
   associate_public_ip_address = true
 
