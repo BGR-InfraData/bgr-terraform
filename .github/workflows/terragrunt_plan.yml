@@ -1,0 +1,68 @@
+name: 'Terraform Plan'
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.4.x
+
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          set -e
+          output=$(terraform plan -no-color)
+          echo "::set-output name=plan_output::$output"
+        continue-on-error: true
+
+      - name: Install TFLint
+        run: |
+          curl -L "$(curl -s https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_amd64.zip")" > tflint.zip && unzip tflint.zip && sudo mv tflint /usr/bin/
+      
+      - name: Run TFLint
+        run: tflint
+
+      - name: Install TFSec
+        run: |
+          curl -L "$(curl -s https://api.github.com/repos/tfsec/tfsec/releases/latest | grep -o -E "https://.+?_linux_amd64.tar.gz")" > tfsec.tar.gz && tar -xzf tfsec.tar.gz && sudo mv tfsec /usr/local/bin/
+
+      - name: Run TFSec
+        run: tfsec
+
+      - name: Comment PR
+        uses: actions/github-script@v5
+        if: github.event_name == 'pull_request'
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `Output of terraform plan:\n\n\`\`\`\n${{ steps.plan.outputs.plan_output }}\n\`\`\``;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            });
