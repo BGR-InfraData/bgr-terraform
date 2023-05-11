@@ -4,8 +4,8 @@ variable "aws_account_id" {
   default     = "444860385156"
 }
 
-variable "aws_user" {
-  description = "AWS Account ID"
+variable "aws_access_iam" {
+  description = "user access account aws"
   type        = string
   default     = "bgr-infra-data"
 }

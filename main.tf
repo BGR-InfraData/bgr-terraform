@@ -1,3 +1,7 @@
+terraform {
+  required_version = ">= 0.12"
+}
+
 module "iam" {
   source        = "./iam"
   iam_role_name = "ec2-bgr-infra"
