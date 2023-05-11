@@ -30,7 +30,7 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init
+        run: terraform -chdir=environments/dev init
 
       - name: Terraform Validate
         id: validate
