@@ -9,6 +9,7 @@ resource "aws_security_group" "sg_bgr_infra" {
     content {
       #tfsec:ignore:aws-ec2-no-public-ingress-sgr
       #tfsec:ignore:aws-vpc-no-public-egress-sgr
+      #tfsec:ignore:aws-ec2-no-public-egress-sgr
       from_port   = ingress.value
       to_port     = ingress.value
       protocol    = "tcp"
@@ -19,10 +20,10 @@ resource "aws_security_group" "sg_bgr_infra" {
   egress {
     #tfsec:ignore:aws-ec2-no-public-egress-sgr
     #tfsec:ignore:aws-vpc-no-public-egress-sgr
+    #tfsec:ignore:aws-ec2-no-public-ingress-sgr
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-

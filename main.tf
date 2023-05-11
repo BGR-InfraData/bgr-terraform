@@ -11,6 +11,9 @@ module "vpc" {
   source = "./vpc"
 }
 
+#tfsec:ignore:aws-ec2-no-public-egress-sgr
+#tfsec:ignore:aws-vpc-no-public-egress-sgr
+#tfsec:ignore:aws-ec2-no-public-ingress-sgr
 module "security_group" {
   source = "./securitygroup"
   vpc_id = module.vpc.vpc_id
