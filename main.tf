@@ -1,3 +1,8 @@
+module "iam" {
+  source        = "./iam"
+  iam_role_name = "ec2-bgr-infra"
+}
+
 module "vpc" {
   source = "./vpc"
 }
@@ -5,11 +10,6 @@ module "vpc" {
 module "security_group" {
   source = "./securitygroup"
   vpc_id = module.vpc.vpc_id
-}
-
-module "iam" {
-  source        = "./iam"
-  iam_role_name = "ec2-bgr-infra"
 }
 
 module "ec2" {
