@@ -14,7 +14,6 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -22,7 +21,6 @@ jobs:
       - name: Install jq
         run: sudo apt-get install -y jq
 
-    
       - name: Debug - List files
         run: |
           echo "Listing project files:"
@@ -62,10 +60,10 @@ jobs:
 
       - name: Install TFSec
         run: |
-         curl -L $(curl -s https://api.github.com/repos/tfsec/tfsec/releases/latest | jq -r '.assets[].browser_download_url | select(contains("linux_amd64.tar.gz"))') > tfsec.tar.gz && tar -xzf tfsec.tar.gz && sudo mv tfsec /usr/local/bin/
+          curl -L $(curl -s https://api.github.com/repos/tfsec/tfsec/releases/latest | jq -r '.assets[].browser_download_url | select(contains("linux_amd64.tar.gz"))') > tfsec.tar.gz && tar -xzf tfsec.tar.gz && sudo mv tfsec /usr/local/bin/
   
       - name: Run TFSec
-        run: tfsec
+        run: tfsec .
 
       - name: Comment PR
         uses: actions/github-script@v5
@@ -76,11 +74,11 @@ jobs:
             const output = `Output of terraform plan:\n\n\`\`\`\n${{ steps.plan.outputs.plan_output }}\n\`\`\``;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
-              owner: context.repo.owner,
+              owner: context
               repo: context.repo.repo,
               body: output
-            });
-      
+             });
+        
       - name: Set output
         id: vars
         run: echo "output_var_name=value" >> $GITHUB_ENV
