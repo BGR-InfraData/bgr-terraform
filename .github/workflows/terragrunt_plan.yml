@@ -18,6 +18,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
     
       - name: Debug - List files
         run: |
@@ -58,8 +62,8 @@ jobs:
 
       - name: Install TFSec
         run: |
-          curl -L "$(curl -s https://api.github.com/repos/tfsec/tfsec/releases/latest | grep -o -E "https://.+?_linux_amd64.tar.gz")" > tfsec.tar.gz && tar -xzf tfsec.tar.gz && sudo mv tfsec /usr/local/bin/
-
+         curl -L $(curl -s https://api.github.com/repos/tfsec/tfsec/releases/latest | jq -r '.assets[].browser_download_url | select(contains("linux_amd64.tar.gz"))') > tfsec.tar.gz && tar -xzf tfsec.tar.gz && sudo mv tfsec /usr/local/bin/
+  
       - name: Run TFSec
         run: tfsec
 
