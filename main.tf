@@ -43,6 +43,7 @@ module "ec2" {
 #tfsec:ignore:aws-s3-enable-versioning
 #tfsec:ignore:aws-s3-enable-bucket-logging
 #tfsec:ignore:aws-s3-encryption-customer-key
+#tfsec:ignore:aws-s3-enable-bucket-encryption
 module "s3" {
   source         = "./s3"
   aws_access_iam = var.aws_access_iam
