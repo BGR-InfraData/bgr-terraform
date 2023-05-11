@@ -66,3 +66,7 @@ jobs:
               repo: context.repo.repo,
               body: output
             });
+      
+      - name: Set output
+        id: vars
+        run: echo "output_var_name=value" >> $GITHUB_ENV
