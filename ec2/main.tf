@@ -8,7 +8,7 @@ module "security_group" {
 }
 
 module "iam" {
-  source        = "../IAM"
+  source        = "../iam"
   iam_role_name = "ec2-bgr-infra"
 }
 
