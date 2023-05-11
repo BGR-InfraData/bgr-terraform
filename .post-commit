@@ -6,14 +6,14 @@ YELLOW='\033[0;33m'
 NC='\033[0m' # No Color
 
 FAILED=0
-echo "Mergeando a branch com a main"
-git pull --no-edit origin main
+echo "Mergeando a branch com a master"
+git pull --no-edit origin master
 
 if [[ $? -eq 0 ]];
 then
-   echo -e "${GREEN}Succesfully merged with main branch${NC}"
+   echo -e "${GREEN}Succesfully merged with master branch${NC}"
 else
-   echo -e "${RED}Fail to merge with main branch, please check again${NC}"
+   echo -e "${RED}Fail to merge with master branch, please check again${NC}"
    FAILED=1
 fi
 echo
@@ -21,7 +21,7 @@ echo
 export BACKEND="local.hcl"
 export SKIP_OUTPUTS=true
 
-TERRAGRUNT_WORKDIRS=$(git diff --name-only origin/main... | grep live | sed -r 's|/[^/]+$||' |  grep -v -e live$ -e _env$ -e module$ | sort | uniq | xargs)
+TERRAGRUNT_WORKDIRS=$(git diff --name-only origin/master... | grep live | sed -r 's|/[^/]+$||' |  grep -v -e live$ -e _env$ -e module$ | sort | uniq | xargs)
 
 GIT_ROOT_DIR=$(git rev-parse --show-toplevel)
 cd $GIT_ROOT_DIR
