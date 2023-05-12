@@ -39,12 +39,10 @@ jobs:
         id: init
         run: terraform init
         
-    terragrunt_validate:
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
 
-    terragrunt_plan:
       - name: Terraform Plan
         id: plan
         run: |
