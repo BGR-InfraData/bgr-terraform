@@ -27,7 +27,7 @@ jobs:
           find . -type f -print
 
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.4.3
 
