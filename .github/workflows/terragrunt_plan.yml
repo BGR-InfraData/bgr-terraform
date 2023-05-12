@@ -73,13 +73,14 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `Output of terraform plan:\n\n\`\`\`\n${{ steps.plan.outputs.plan_output }}\n\`\`\``;
+           const output = `Output of terraform plan:\n\n\`\`\`\n${{ steps.plan.outputs.plan_output }}\n\`\`\``;
             github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context
-              repo: context.repo.repo,
-              body: output
-             });
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+             body: output
+           });
+
         
       - name: Set output
         id: vars
