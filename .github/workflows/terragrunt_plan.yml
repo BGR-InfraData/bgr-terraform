@@ -51,22 +51,12 @@ jobs:
           echo "::set-output name=plan_output::$output"
         continue-on-error: true
 
-      - uses: terraform-linters/setup-tflint@v3
-        name: Setup TFLint
-        with:
-         tflint_version: v0.45.0
-
-      - name: Show version
-        run: tflint --version
-
-      - name: Init TFLint
-        run: tflint --init
-        env:
-        # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
-        GITHUB_TOKEN: ${{ github.token }}
-
+      - name: Install TFLint
+        run: |
+          curl -L "$(curl -s https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_amd64.zip")" > tflint.zip && unzip tflint.zip && sudo mv tflint /usr/bin/
+      
       - name: Run TFLint
-        run: tflint -f compact
+        run: tflint
 
       - name: Install TFSec
         run: |
