@@ -27,7 +27,7 @@ jobs:
           find . -type f -print
 
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.4.3
 
@@ -38,35 +38,17 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init
-
+        
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
 
-      - name: Terraform Plan
-        id: plan
+      - name: Install TFLint
         run: |
-          set -e
-          output=$(terraform plan -no-color)
-          echo "::set-output name=plan_output::$output"
-        continue-on-error: true
-
-      - uses: terraform-linters/setup-tflint@v3
-        name: Setup TFLint
-        with:
-         tflint_version: v0.45.0
-
-      - name: Show version
-        run: tflint --version
-
-      - name: Init TFLint
-        run: tflint --init
-        env:
-        # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
-        GITHUB_TOKEN: ${{ github.token }}
-
+          curl -L "$(curl -s https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_amd64.zip")" > tflint.zip && unzip tflint.zip && sudo mv tflint /usr/bin/
+      
       - name: Run TFLint
-        run: tflint -f compact
+        run: tflint
 
       - name: Install TFSec
         run: |
@@ -77,20 +59,28 @@ jobs:
       - name: Run TFSec
         run: tfsec .
 
+      - name: Terraform Plan
+        id: plan
+        run: |
+          set -e
+          terraform plan -no-color > plan_output.txt
+        continue-on-error: true
+
       - name: Comment PR
         uses: actions/github-script@v5
         if: github.event_name == 'pull_request'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `Output of terraform plan:\n\n\`\`\`\n${{ steps.plan.outputs.plan_output }}\n\`\`\``;
+            const fs = require('fs');
+            const output = fs.readFileSync('plan_output.txt', 'utf8');
             github.rest.issues.createComment({
               issue_number: context.issue.number,
-              owner: context
+              owner: context.repo.owner,
               repo: context.repo.repo,
-              body: output
-             });
-        
+              body: `Output of terraform plan:\n\n\`\`\`\n${output}\n\`\`\``
+            });
+  
       - name: Set output
         id: vars
         run: echo "output_var_name=value" >> $GITHUB_ENV

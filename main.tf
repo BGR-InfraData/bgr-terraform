@@ -48,5 +48,4 @@ module "s3" {
   source         = "./s3"
   aws_access_iam = var.aws_access_iam
   aws_account_id = var.aws_account_id
-
 }
