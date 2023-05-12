@@ -1,4 +1,4 @@
-## commands
+## Commands
 
 to enable `terraform fmt` and `terragrunt hclfmt` before commits:
 
@@ -14,4 +14,3 @@ cd <DIR_REPO>
 ln -s ../../.post-commit .git/hooks/post-commit
 tflint --init
 ``````
-te
