@@ -9,15 +9,27 @@ jobs:
   terraform:
     name: 'Terraform'
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Debug - List files
+        run: |
+          echo "Listing project files:"
+          find . -type f -print
+
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.4.x
+          terraform_version: 1.4.3
 
       - name: Terraform Format
         id: fmt
@@ -39,19 +51,31 @@ jobs:
           echo "::set-output name=plan_output::$output"
         continue-on-error: true
 
-      - name: Install TFLint
-        run: |
-          curl -L "$(curl -s https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_amd64.zip")" > tflint.zip && unzip tflint.zip && sudo mv tflint /usr/bin/
-      
+      - uses: terraform-linters/setup-tflint@v3
+        name: Setup TFLint
+        with:
+         tflint_version: v0.45.0
+
+      - name: Show version
+        run: tflint --version
+
+      - name: Init TFLint
+        run: tflint --init
+        env:
+        # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
+        GITHUB_TOKEN: ${{ github.token }}
+
       - name: Run TFLint
-        run: tflint
+        run: tflint -f compact
 
       - name: Install TFSec
         run: |
-          curl -L "$(curl -s https://api.github.com/repos/tfsec/tfsec/releases/latest | grep -o -E "https://.+?_linux_amd64.tar.gz")" > tfsec.tar.gz && tar -xzf tfsec.tar.gz && sudo mv tfsec /usr/local/bin/
+         wget -q https://github.com/tfsec/tfsec/releases/latest/download/tfsec-linux-amd64 -O tfsec
+         chmod +x tfsec
+         sudo mv tfsec /usr/local/bin/
 
       - name: Run TFSec
-        run: tfsec
+        run: tfsec .
 
       - name: Comment PR
         uses: actions/github-script@v5
@@ -62,7 +86,11 @@ jobs:
             const output = `Output of terraform plan:\n\n\`\`\`\n${{ steps.plan.outputs.plan_output }}\n\`\`\``;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
-              owner: context.repo.owner,
+              owner: context
               repo: context.repo.repo,
               body: output
-            });
+             });
+        
+      - name: Set output
+        id: vars
+        run: echo "output_var_name=value" >> $GITHUB_ENV

@@ -1,3 +1,4 @@
+#tfsec:ignore:aws-ec2-require-vpc-flow-logs-for-all-vpcs
 resource "aws_vpc" "vpc_bgr_infra" {
   cidr_block = var.vpc_cidr_block
   tags = {

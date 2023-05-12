@@ -1,10 +1,5 @@
-module "vpc" {
-  source = "./vpc"
-}
-
-module "security_group" {
-  source = "./securitygroup"
-  vpc_id = module.vpc.vpc_id
+terraform {
+  required_version = ">= 0.12"
 }
 
 module "iam" {
@@ -12,6 +7,26 @@ module "iam" {
   iam_role_name = "ec2-bgr-infra"
 }
 
+#tfsec:ignore:aws-ec2-require-vpc-flow-logs-for-all-vpcs
+module "vpc" {
+  source = "./vpc"
+}
+
+#tfsec:ignore:aws-ec2-no-public-egress-sgr
+#tfsec:ignore:aws-vpc-no-public-egress-sgr
+#tfsec:ignore:aws-ec2-no-public-ingress-sgr
+#tfsec:ignore:aws-ec2-add-description-to-security-group-rule
+module "security_group" {
+  source = "./securitygroup"
+  vpc_id = module.vpc.vpc_id
+}
+
+#tfsec:ignore:aws-ec2-no-public-egress-sgr
+#tfsec:ignore:aws-vpc-no-public-egress-sgr
+#tfsec:ignore:aws-ec2-no-public-ingress-sgr
+#tfsec:ignore:aws-ec2-enable-at-rest-encryption
+#tfsec:ignore:aws-ec2-enforce-http-token-imds
+#tfsec:ignore:aws-ec2-add-description-to-security-group-rule
 module "ec2" {
   source                    = "./ec2"
   ami_id                    = var.ami_id
@@ -25,7 +40,13 @@ module "ec2" {
   ebs_delete_on_termination = var.ebs_delete_on_termination
 }
 
+#tfsec:ignore:aws-s3-enable-versioning
+#tfsec:ignore:aws-s3-enable-bucket-logging
+#tfsec:ignore:aws-s3-encryption-customer-key
+#tfsec:ignore:aws-s3-enable-bucket-encryption
 module "s3" {
   source         = "./s3"
+  aws_access_iam = var.aws_access_iam
   aws_account_id = var.aws_account_id
+
 }

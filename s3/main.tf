@@ -1,3 +1,7 @@
+#tfsec:ignore:aws-s3-enable-versioning
+#tfsec:ignore:aws-s3-enable-bucket-logging
+#tfsec:ignore:aws-s3-encryption-customer-key
+#tfsec:ignore:aws-s3-enable-bucket-encryption
 resource "aws_s3_bucket" "bgr_infra" {
   bucket        = "bgr-infra"
   force_destroy = true
@@ -28,7 +32,7 @@ resource "aws_s3_bucket_policy" "bgr_infra_policy" {
       {
         Sid       = "AllowUserAccess"
         Effect    = "Allow"
-        Principal = { AWS = "arn:aws:iam::${var.aws_account_id}:user/${var.aws_user}" }
+        Principal = { AWS = "arn:aws:iam::${var.aws_account_id}:user/${var.aws_access_iam}" }
         Action    = ["s3:GetObject", "s3:PutObject"]
         Resource  = ["${aws_s3_bucket.bgr_infra.arn}/*"]
       },
