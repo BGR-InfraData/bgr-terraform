@@ -14,3 +14,4 @@ cd <DIR_REPO>
 ln -s ../../.post-commit .git/hooks/post-commit
 tflint --init
 ``````
+te
