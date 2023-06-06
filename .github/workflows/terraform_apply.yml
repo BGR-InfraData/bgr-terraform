@@ -1,0 +1,28 @@
+name: 'Terragrunt Apply'
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+
+jobs:
+  terragrunt_dispatch_apply_repo:
+    name: 'Terragrunt Dispatch Apply Repo'
+    runs-on: ubuntu-latest
+    container:
+      image: alpine:latest    
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Installing prereq packages 
+        run: apk add --no-cache curl
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Post Terragrunt deploy
+        id: terragrunt_dispatch
+        env:
+          AUTH_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          echo "Dispatching new workflow to https://github.com/BGR-InfraData/bgr-data-terraform-apply"
+          curl -v --location "https://api.github.com/repos/BGR-InfraData/bgr-data-terraform-apply/actions/workflows/deploy.yml/dispatches" --header "Accept: application/vnd.github.v3+json" --header "Authorization: Bearer ${AUTH_TOKEN}" -d '{"ref": "main","inputs":{"apply_pr_number":"'"${PR_NUMBER}"'"}}'
