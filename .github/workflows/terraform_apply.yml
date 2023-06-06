@@ -25,4 +25,4 @@ jobs:
           PR_NUMBER: ${{ github.event.number }}
         run: |
           echo "Dispatching new workflow to https://github.com/BGR-InfraData/bgr-data-terraform-apply"
-          curl -v --location "https://api.github.com/repos/BGR-InfraData/bgr-data-terraform-apply/actions/workflows/deploy.yml/dispatches" --header "Accept: application/vnd.github.v3+json" --header "Authorization: Bearer ${AUTH_TOKEN}" -d '{"ref": "main","inputs":{"apply_pr_number":"'"${PR_NUMBER}"'"}}'
+          curl -v --location "https://api.github.com/repos/BGR-InfraData/bgr-data-terraform-apply/actions/workflows/deploy.yml/dispatches" --header "Accept: application/vnd.github.v3+json" --header "Authorization: Bearer ${AUTH_TOKEN}" -d '{"ref": "master","inputs":{"apply_pr_number":"'"${PR_NUMBER}"'"}}'
