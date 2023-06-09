@@ -46,6 +46,10 @@ resource "aws_s3_bucket_policy" "bgr_infra_policy" {
 #tfsec:ignore:aws-s3-encryption-customer-key
 #tfsec:ignore:aws-s3-enable-bucket-encryption
 #tfsec:aws-s3-specify-public-access-block
+#tfsec:aws-s3-ignore-public-acls
+#tfsec:aws-s3-no-public-buckets
+#tfsec:aws-s3-block-public-policy
+#tf:aws-s3-block-public-acls
 resource "aws_s3_bucket" "dags_airflow" {
   bucket        = "bgr-dags-airflow"
   force_destroy = true

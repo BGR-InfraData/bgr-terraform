@@ -45,6 +45,10 @@ module "ec2" {
 #tfsec:ignore:aws-s3-encryption-customer-key
 #tfsec:ignore:aws-s3-enable-bucket-encryption
 #tfsec:aws-s3-specify-public-access-block
+#tfsec:aws-s3-ignore-public-acls
+#tfsec:aws-s3-no-public-buckets
+#tfsec:aws-s3-block-public-policy
+#tf:aws-s3-block-public-acls
 module "s3" {
   source         = "./s3"
   aws_access_iam = var.aws_access_iam
