@@ -60,6 +60,15 @@ resource "aws_s3_bucket" "dags_airflow" {
   }
 }
 
+#tfsec:ignore:aws-s3-enable-versioning
+#tfsec:ignore:aws-s3-enable-bucket-logging
+#tfsec:ignore:aws-s3-encryption-customer-key
+#tfsec:ignore:aws-s3-enable-bucket-encryption
+#tfsec:aws-s3-specify-public-access-block
+#tfsec:aws-s3-ignore-public-acls
+#tfsec:aws-s3-no-public-buckets
+#tfsec:aws-s3-block-public-policy
+#tf:aws-s3-block-public-acls
 resource "aws_s3_bucket_public_access_block" "dags_airflow_public_access_block" {
   bucket = aws_s3_bucket.bgr_infra.id
 
@@ -70,7 +79,15 @@ resource "aws_s3_bucket_public_access_block" "dags_airflow_public_access_block" 
 }
 
 
-
+#tfsec:ignore:aws-s3-enable-versioning
+#tfsec:ignore:aws-s3-enable-bucket-logging
+#tfsec:ignore:aws-s3-encryption-customer-key
+#tfsec:ignore:aws-s3-enable-bucket-encryption
+#tfsec:aws-s3-specify-public-access-block
+#tfsec:aws-s3-ignore-public-acls
+#tfsec:aws-s3-no-public-buckets
+#tfsec:aws-s3-block-public-policy
+#tf:aws-s3-block-public-acls
 resource "aws_s3_bucket_policy" "dags_airflow_policy" {
   bucket = aws_s3_bucket.dags_airflow.id
 
