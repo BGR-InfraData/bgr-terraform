@@ -46,11 +46,11 @@ resource "aws_s3_bucket_policy" "bgr_infra_policy" {
 #tfsec:ignore:aws-s3-encryption-customer-key
 #tfsec:ignore:aws-s3-enable-bucket-encryption
 resource "aws_s3_bucket" "dags_airflow" {
-  bucket        = "dags_airflow"
+  bucket        = "bgr-dags-airflow"
   force_destroy = true
 
   tags = {
-    Name        = "dags_airflow"
+    Name        = "bgr-dags_airflow"
     Environment = "production"
   }
 }
